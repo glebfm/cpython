@@ -365,6 +365,24 @@ _ssl__SSLSocket_verify_client_post_handshake(PySSLSocket *self, PyObject *Py_UNU
     return _ssl__SSLSocket_verify_client_post_handshake_impl(self);
 }
 
+PyDoc_STRVAR(_ssl__SSLSocket__ssl_addr__doc__,
+"_ssl_addr($self, /)\n"
+"--\n"
+"\n"
+"Return address of internal SSL pointer.");
+
+#define _SSL__SSLSOCKET__SSL_ADDR_METHODDEF    \
+    {"_ssl_addr", (PyCFunction)_ssl__SSLSocket__ssl_addr, METH_NOARGS, _ssl__SSLSocket__ssl_addr__doc__},
+
+static PyObject *
+_ssl__SSLSocket__ssl_addr_impl(PySSLSocket *self);
+
+static PyObject *
+_ssl__SSLSocket__ssl_addr(PySSLSocket *self, PyObject *Py_UNUSED(ignored))
+{
+    return _ssl__SSLSocket__ssl_addr_impl(self);
+}
+
 static PyObject *
 _ssl__SSLContext_impl(PyTypeObject *type, int proto_version);
 
@@ -840,6 +858,24 @@ skip_optional_pos:
 
 exit:
     return return_value;
+}
+
+PyDoc_STRVAR(_ssl__SSLContext__ssl_ctx_addr__doc__,
+"_ssl_ctx_addr($self, /)\n"
+"--\n"
+"\n"
+"Return address of internal SSL_CTX pointer.");
+
+#define _SSL__SSLCONTEXT__SSL_CTX_ADDR_METHODDEF    \
+    {"_ssl_ctx_addr", (PyCFunction)_ssl__SSLContext__ssl_ctx_addr, METH_NOARGS, _ssl__SSLContext__ssl_ctx_addr__doc__},
+
+static PyObject *
+_ssl__SSLContext__ssl_ctx_addr_impl(PySSLContext *self);
+
+static PyObject *
+_ssl__SSLContext__ssl_ctx_addr(PySSLContext *self, PyObject *Py_UNUSED(ignored))
+{
+    return _ssl__SSLContext__ssl_ctx_addr_impl(self);
 }
 
 static PyObject *
@@ -1324,4 +1360,4 @@ exit:
 #ifndef _SSL_ENUM_CRLS_METHODDEF
     #define _SSL_ENUM_CRLS_METHODDEF
 #endif /* !defined(_SSL_ENUM_CRLS_METHODDEF) */
-/*[clinic end generated code: output=83e68c77bd96789a input=a9049054013a1b77]*/
+/*[clinic end generated code: output=fcda41d8044ebca6 input=a9049054013a1b77]*/

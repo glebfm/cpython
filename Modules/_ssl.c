@@ -2645,6 +2645,22 @@ _ssl__SSLSocket_verify_client_post_handshake_impl(PySSLSocket *self)
 #endif
 }
 
+/*[clinic input]
+_ssl._SSLSocket._ssl_addr
+
+Return address of internal SSL pointer.
+[clinic start generated code]*/
+
+static PyObject *
+_ssl__SSLSocket__ssl_addr_impl(PySSLSocket *self)
+/*[clinic end generated code: output=2a4f5363fc4cc022 input=1e11cf840ed0a892]*/
+{
+    if (PySys_Audit("ssl.SSLSocket._ssl_addr", "O", self) < 0) {
+        return NULL;
+    }
+    return PyLong_FromVoidPtr((void*)self->ssl);
+}
+
 static SSL_SESSION*
 _ssl_session_dup(SSL_SESSION *session) {
     SSL_SESSION *newsession = NULL;
@@ -2809,6 +2825,7 @@ static PyMethodDef PySSLMethods[] = {
     _SSL__SSLSOCKET_COMPRESSION_METHODDEF
     _SSL__SSLSOCKET_SHUTDOWN_METHODDEF
     _SSL__SSLSOCKET_VERIFY_CLIENT_POST_HANDSHAKE_METHODDEF
+    _SSL__SSLSOCKET__SSL_ADDR_METHODDEF
     {NULL, NULL}
 };
 
@@ -4462,6 +4479,22 @@ _ssl__SSLContext_get_ca_certs_impl(PySSLContext *self, int binary_form)
     return NULL;
 }
 
+/*[clinic input]
+_ssl._SSLContext._ssl_ctx_addr
+
+Return address of internal SSL_CTX pointer.
+[clinic start generated code]*/
+
+static PyObject *
+_ssl__SSLContext__ssl_ctx_addr_impl(PySSLContext *self)
+/*[clinic end generated code: output=41ae26005ce1e521 input=31cf4c79e6da812e]*/
+{
+    if (PySys_Audit("ssl.SSLContext._ssl_ctx_addr", "O", self) < 0) {
+        return NULL;
+    }
+    return PyLong_FromVoidPtr((void*)self->ctx);
+}
+
 
 static PyGetSetDef context_getsetlist[] = {
     {"check_hostname", (getter) get_check_hostname,
@@ -4516,6 +4549,7 @@ static struct PyMethodDef context_methods[] = {
     _SSL__SSLCONTEXT_CERT_STORE_STATS_METHODDEF
     _SSL__SSLCONTEXT_GET_CA_CERTS_METHODDEF
     _SSL__SSLCONTEXT_GET_CIPHERS_METHODDEF
+    _SSL__SSLCONTEXT__SSL_CTX_ADDR_METHODDEF
     {NULL, NULL}        /* sentinel */
 };
 
@@ -5490,6 +5524,68 @@ static PyMethodDef PySSL_methods[] = {
     {NULL,                  NULL}            /* Sentinel */
 };
 
+/* PySSL_CAPI capsule */
+static SSL_CTX*
+_ssl__SSLContext_get_ssl_ctx_ptr(PyObject *ob)
+{
+    _sslmodulestate *state = PyModule_GetState(
+        PyState_FindModule(&_sslmodule_def));
+
+    if (!PyObject_IsInstance(ob, (PyObject*)state->PySSLContext_Type)) {
+        PyErr_SetString(PyExc_TypeError, "value must be a SSLContext");
+        return NULL;
+    }
+
+    return ((PySSLContext*)ob)->ctx;
+}
+
+static SSL*
+_ssl__SSLSocket_get_ssl_ptr(PyObject *ob)
+{
+    _sslmodulestate *state = PyModule_GetState(
+        PyState_FindModule(&_sslmodule_def));
+
+    if (!PyObject_IsInstance(ob, (PyObject*)state->PySSLSocket_Type)) {
+        PyErr_SetString(PyExc_TypeError, "value must be a SSLContext");
+        return NULL;
+    }
+
+    return ((PySSLSocket*)ob)->ssl;
+}
+
+static void
+pyssl_capi_destructor(PyObject *capsule)
+{
+    void *p = PyCapsule_GetPointer(capsule, PySSL_CAPSULE_NAME);
+    PyMem_Free(p);
+}
+
+static int
+sslmodule_init_capi(PyObject *module)
+{
+    PyObject *c = NULL;
+
+    PySSL_CAPI *capi = (PySSL_CAPI*)PyMem_Malloc(sizeof(PySSL_CAPI));
+    if (capi == NULL) {
+        PyErr_NoMemory();
+        return -1;
+    }
+    capi->size = sizeof(PySSL_CAPI);
+    capi->SSLContext_get_ssl_ctx = _ssl__SSLContext_get_ssl_ctx_ptr;
+    capi->SSLSocket_get_ssl = _ssl__SSLSocket_get_ssl_ptr;
+
+    c = PyCapsule_New(capi, PySSL_CAPSULE_NAME, pyssl_capi_destructor);
+    if (c == NULL) {
+        PyMem_Free(capi);
+        return -1;
+    }
+
+    if (PyModule_AddObjectRef(module, "ssl_CAPI", c) < 0) {
+        return -1;
+    }
+    return 0;
+}
+
 
 PyDoc_STRVAR(module_doc,
 "Implementation module for SSL socket operations.  See the socket module\n\
@@ -5996,6 +6092,7 @@ static PyModuleDef_Slot sslmodule_slots[] = {
     {Py_mod_exec, sslmodule_init_errorcodes},
     {Py_mod_exec, sslmodule_init_constants},
     {Py_mod_exec, sslmodule_init_versioninfo},
+    {Py_mod_exec, sslmodule_init_capi},
     {0, NULL}
 };
 

@@ -1,6 +1,8 @@
 #ifndef Py_SSL_H
 #define Py_SSL_H
 
+#include <openssl/ssl.h>
+
 /*
  * ssl module state
  */
@@ -41,5 +43,15 @@ get_ssl_state(PyObject *module)
 #define get_state_ctx(c) (((PySSLContext *)(c))->state)
 #define get_state_sock(s) (((PySSLSocket *)(s))->ctx->state)
 #define get_state_mbio(b) ((_sslmodulestate *)PyType_GetModuleState(Py_TYPE(b)))
+
+/* Capsule */
+
+#define PySSL_CAPSULE_NAME "_ssl.ssl_CAPI"
+
+typedef struct {
+    size_t size;
+    SSL_CTX *(*SSLContext_get_ssl_ctx)(PyObject *ob);
+    SSL *(*SSLSocket_get_ssl)(PyObject *ob);
+} PySSL_CAPI;
 
 #endif /* Py_SSL_H */
