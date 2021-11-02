@@ -107,7 +107,7 @@ Tools/unicode/data/
 /platform
 /profile-clean-stamp
 /profile-run-stamp
-/Python/deepfreeze/*.c
+/Python/deepfreeze/*
 /pybuilddir.txt
 /pyconfig.h
 /python-config
