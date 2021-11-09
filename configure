@@ -1763,9 +1763,9 @@ Optional Packages:
   --with-undefined-behavior-sanitizer
                           enable UndefinedBehaviorSanitizer undefined
                           behaviour detector, 'ubsan' (default is no)
-  --with-hash-algorithm=[fnv|siphash13|siphash24]
+  --with-hash-algorithm=[fnv|siphash13|siphash24|xxh3]
                           select hash algorithm for use in Python/pyhash.c
-                          (default is SipHash13)
+                          (default is xxh3)
   --with-tzpath=<list of absolute paths separated by pathsep>
                            Select the default time zone search path for zoneinfo.TZPATH
 
@@ -11099,6 +11099,10 @@ case "$withval" in
         $as_echo "#define Py_HASH_ALGORITHM 2" >>confdefs.h
 
         ;;
+    xxh3)
+	$as_echo "#define Py_HASH_ALGORITHM 4" >>confdefs.h
+
+	;;
     *)
         as_fn_error $? "unknown hash algorithm '$withval'" "$LINENO" 5
         ;;

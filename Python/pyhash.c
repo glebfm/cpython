@@ -503,6 +503,20 @@ pysiphash(const void *src, Py_ssize_t src_sz) {
 static PyHash_FuncDef PyHash_Func = {pysiphash, "siphash24", 64, 128};
 #endif
 
+#if Py_HASH_ALGORITHM == Py_HASH_XXHASH3
+
+#define XXH_STATIC_LINKING_ONLY   /* access advanced declarations */
+#define XXH_IMPLEMENTATION   /* access definitions */
+#include "xxhash.h"
+
+static Py_hash_t
+pyxxhash3(const void *src, Py_ssize_t src_sz) {
+    return (Py_hash_t)XXH3_64bits_withSeed(src, (size_t)src_sz, _Py_HashSecret.xxhash3.xxseed);
+}
+
+static PyHash_FuncDef PyHash_Func = {pyxxhash3, "xxhash3", 64, 64};
+#endif
+
 #ifdef __cplusplus
 }
 #endif

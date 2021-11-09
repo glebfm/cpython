@@ -74,6 +74,9 @@ typedef union {
         unsigned char padding[16];
         Py_hash_t hashsalt;
     } expat;
+    struct {
+        uint64_t xxseed;
+    } xxhash3;
 } _Py_HashSecret_t;
 PyAPI_DATA(_Py_HashSecret_t) _Py_HashSecret;
 
@@ -128,10 +131,11 @@ PyAPI_FUNC(PyHash_FuncDef*) PyHash_GetFuncDef(void);
 #define Py_HASH_SIPHASH24 1
 #define Py_HASH_FNV 2
 #define Py_HASH_SIPHASH13 3
+#define Py_HASH_XXHASH3 4
 
 #ifndef Py_HASH_ALGORITHM
 #  ifndef HAVE_ALIGNED_REQUIRED
-#    define Py_HASH_ALGORITHM Py_HASH_SIPHASH13
+#    define Py_HASH_ALGORITHM Py_HASH_XXHASH3
 #  else
 #    define Py_HASH_ALGORITHM Py_HASH_FNV
 #  endif /* uint64_t && uint32_t && aligned */
