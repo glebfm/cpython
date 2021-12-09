@@ -621,6 +621,13 @@ extern char * _getpty(int *, int, mode_t, int);
 #       endif /* __cplusplus */
 #endif
 
+#ifdef Py_GCC_PLUGIN
+  #define PyAPI_ABI_FUNC(RTYPE) PyAPI_FUNC(RTYPE) __attribute__((pythonapi("abi_func")))
+#else
+  #define PyAPI_ABI_FUNC(RTYPE) PyAPI_FUNC(RTYPE)
+#endif
+
+
 /* limits.h constants that may be missing */
 
 #ifndef INT_MAX
