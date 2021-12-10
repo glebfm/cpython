@@ -622,9 +622,9 @@ extern char * _getpty(int *, int, mode_t, int);
 #endif
 
 #ifdef Py_GCC_PLUGIN
-  #define PyAPI_ABI_FUNC(RTYPE) PyAPI_FUNC(RTYPE) __attribute__((pythonapi("abi_func")))
+  #define PyAPI_ABI_FUNC(VERSION, RTYPE) PyAPI_FUNC(RTYPE) __attribute__((pythonapi("abi_func", VERSION)))
 #else
-  #define PyAPI_ABI_FUNC(RTYPE) PyAPI_FUNC(RTYPE)
+  #define PyAPI_ABI_FUNC(VERSION, RTYPE) PyAPI_FUNC(RTYPE)
 #endif
 
 

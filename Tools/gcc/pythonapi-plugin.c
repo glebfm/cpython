@@ -9,16 +9,17 @@ static tree
 handle_pythonapi_attribute (tree *node, tree name, tree args,
 			int flags, bool *no_add_attrs)
 {
-    print_generic_decl(stderr, *node, TDF_RAW);
+    //print_generic_decl(stderr, *node, TDF_RAW);
+    print_generic_stmt(stderr, *node, TDF_NONE);
     //print_generic_stmt(stderr, name, TDF_NONE);
-    print_generic_stmt_indented(stderr, args, TDF_RAW, 1);
+    print_generic_stmt_indented(stderr, args, TDF_NONE, 1);
     return NULL_TREE;
 }
 
 static struct attribute_spec pythonapi_attr = {
     .name="pythonapi", 
-    .min_length=1,
-    .max_length=1,
+    .min_length=2,
+    .max_length=2,
     .decl_required=true,
 };
 
