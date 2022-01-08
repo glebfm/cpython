@@ -7,7 +7,11 @@
 #if defined(__APPLE__) || defined(HAVE_PTHREAD_DESTRUCTOR)
 #define destructor xxdestructor
 #endif
-#include <pthread.h>
+#ifdef PY_PTHREAD_STUB
+#  include "pythread_stub.h"
+#else
+#  include <pthread.h>
+#endif
 #if defined(__APPLE__) || defined(HAVE_PTHREAD_DESTRUCTOR)
 #undef destructor
 #endif

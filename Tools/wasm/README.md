@@ -139,3 +139,35 @@ linker options.
 - pthread support requires WASM threads and SharedArrayBuffer (bulk memory).
   The runtime keeps a pool of web workers around. Each web worker uses
   several file descriptors (eventfd, epoll, pipe).
+```shell
+python3 -m http.server
+```
+
+## wasm32-wasi build
+
+```
+mkdir builddir/wasi
+pushd builddir/wasi
+```
+
+```
+CC="/opt/wasi-sdk/bin/clang -Wno-c2x-extensions" \
+LDSHARED=/opt/wasi-sdk/bin/wasm-ld \
+AR=/opt/wasi-sdk/bin/ar \
+CONFIG_SITE=../../Tools/wasm/config.site-wasm32-wasi \
+  ../../configure -C \
+    --host=wasm32-wasi \
+    --build=$(../../config.guess) \
+    --with-build-python=$(pwd)/../build/python \
+    --disable-ipv6
+```
+
+```
+make
+```
+
+```
+wasmtime --mapdir=.::../.. -- ./python.wasm -c "import sys; print(f'Hello {sys.platform}')"
+```
+
+Note: Interactive REPL is not working yet.

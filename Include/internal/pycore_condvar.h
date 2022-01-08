@@ -22,6 +22,8 @@
 
 #ifdef HAVE_PTHREAD_H
 #  include <pthread.h>
+#elif defined(PY_PTHREAD_STUB)
+#  include "pythread_stub.h"
 #endif
 
 #define PyMUTEX_T pthread_mutex_t

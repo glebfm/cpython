@@ -281,11 +281,12 @@ if not executable and program_name and ENV_PATH:
     # Resolve names against PATH.
     # NOTE: The use_environment value is ignored for this lookup.
     # To properly isolate, launch Python with a full path.
-    for p in ENV_PATH.split(DELIM):
-        p = joinpath(p, program_name)
-        if isxfile(p):
-            executable = p
-            break
+    if ENV_PATH:
+        for p in ENV_PATH.split(DELIM):
+            p = joinpath(p, program_name)
+            if isxfile(p):
+                executable = p
+                break
 
 if not executable:
     executable = ''

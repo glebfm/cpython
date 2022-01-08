@@ -3719,7 +3719,7 @@ pthread_create (NULL, NULL, start_routine, NULL)]])],[
     posix_threads=yes
     LIBS="$LIBS -lcma"
     ],[
-    AC_MSG_ERROR([could not find pthreads on your system])
+    AC_DEFINE([PY_PTHREAD_STUB], [1], [Define if you want to stub pthreads])
     ])
     ])])])])])
 
@@ -4147,8 +4147,8 @@ fi
 # checks for library functions
 AC_CHECK_FUNCS([ \
   accept4 alarm bind_textdomain_codeset chmod chown clock close_range confstr \
-  copy_file_range ctermid dup3 execv explicit_bzero explicit_memset \
-  faccessat fchmod fchmodat fchown fchownat fdopendir fdwalk fexecve \
+  copy_file_range ctermid dup dup3 execv explicit_bzero explicit_memset \
+  faccessat fchmod fchmodat fchown fchownat fdopendir fdwalk fexecve fopencookie \
   fork fork1 fpathconf fstatat ftime ftruncate futimens futimes futimesat \
   gai_strerror getegid getentropy geteuid getgid getgrgid getgrgid_r \
   getgrnam_r getgrouplist getgroups getitimer getloadavg getlogin \

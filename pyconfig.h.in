@@ -281,6 +281,9 @@
 /* Define to 1 if you have the `dlopen' function. */
 #undef HAVE_DLOPEN
 
+/* Define to 1 if you have the `dup' function. */
+#undef HAVE_DUP
+
 /* Define to 1 if you have the `dup2' function. */
 #undef HAVE_DUP2
 
@@ -361,6 +364,9 @@
 
 /* Define to 1 if you have the `flock' function. */
 #undef HAVE_FLOCK
+
+/* Define to 1 if you have the `fopencookie' function. */
+#undef HAVE_FOPENCOOKIE
 
 /* Define to 1 if you have the `fork' function. */
 #undef HAVE_FORK
@@ -1499,6 +1505,9 @@
 
 /* Define to printf format modifier for Py_ssize_t */
 #undef PY_FORMAT_SIZE_T
+
+/* Define if you want to stub pthreads */
+#undef PY_PTHREAD_STUB
 
 /* Define to 1 to build the sqlite module with loadable extensions support. */
 #undef PY_SQLITE_ENABLE_LOAD_EXTENSION

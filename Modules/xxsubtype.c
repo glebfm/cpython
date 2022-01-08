@@ -232,6 +232,7 @@ static PyTypeObject spamdict_type = {
     0,                                          /* tp_new */
 };
 
+#ifdef HAVE_CLOCK
 static PyObject *
 spam_bench(PyObject *self, PyObject *args)
 {
@@ -253,9 +254,12 @@ spam_bench(PyObject *self, PyObject *args)
 #endif
     return PyFloat_FromDouble((double)(t1-t0) / CLOCKS_PER_SEC);
 }
+#endif
 
 static PyMethodDef xxsubtype_functions[] = {
+#ifdef HAVE_CLOCK
     {"bench",           spam_bench,     METH_VARARGS},
+#endif
     {NULL,              NULL}           /* sentinel */
 };
 

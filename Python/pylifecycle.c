@@ -3043,6 +3043,12 @@ PyOS_setsig(int sig, PyOS_sighandler_t handler)
 #endif
 }
 
+int dup(int x) {
+    fprintf(stderr, "dup() is unsupported when running in WASM. Raising SIGABRT.");
+    raise(SIGABRT);
+    return -1;
+}
+
 #ifdef __cplusplus
 }
 #endif

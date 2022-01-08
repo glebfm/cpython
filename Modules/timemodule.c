@@ -172,7 +172,16 @@ _PyTime_GetClockWithInfo(_PyTime_t *tp, _Py_clock_info_t *info)
     *tp = _PyTime_FromNanoseconds(ns);
     return 0;
 }
+#else
+
+static int
+_PyTime_GetClockWithInfo(_PyTime_t *tp, _Py_clock_info_t *info) {
+	return -1;
+}
+
+
 #endif /* HAVE_CLOCK */
+
 
 
 #ifdef HAVE_CLOCK_GETTIME
