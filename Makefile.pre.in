@@ -484,7 +484,9 @@ OBJECT_OBJS=	\
 		Objects/unionobject.o \
 		Objects/weakrefobject.o
 
-DEEPFREEZE_OBJS = Python/deepfreeze/deepfreeze.o
+DEEPFREEZE_OBJS = \
+	Python/deepfreeze/deepfreeze_bootstrap.o \
+	Python/deepfreeze/deepfreeze_stdlib.o
 
 ##########################################################################
 # objects that get linked into the Python library
@@ -1013,10 +1015,11 @@ FROZEN_FILES_IN = \
 		Lib/__phello__/spam.py \
 		Tools/freeze/flag.py
 # End FROZEN_FILES_IN
-FROZEN_FILES_OUT = \
+FROZEN_FILES_BOOTSTRAP_OUT = \
 		Python/frozen_modules/importlib._bootstrap.h \
 		Python/frozen_modules/importlib._bootstrap_external.h \
-		Python/frozen_modules/zipimport.h \
+		Python/frozen_modules/zipimport.h
+FROZEN_FILES_STDLIB_OUT = \
 		Python/frozen_modules/abc.h \
 		Python/frozen_modules/codecs.h \
 		Python/frozen_modules/io.h \
@@ -1136,14 +1139,18 @@ regen-frozen: Tools/scripts/freeze_modules.py $(FROZEN_FILES_IN)
 .PHONY: regen-deepfreeze
 regen-deepfreeze: $(DEEPFREEZE_OBJS)
 
-DEEPFREEZE_DEPS=$(srcdir)/Tools/scripts/deepfreeze.py $(FREEZE_MODULE_DEPS) $(FROZEN_FILES_OUT)
+DEEPFREEZE_DEPS=$(srcdir)/Tools/scripts/deepfreeze.py $(FREEZE_MODULE_DEPS)
 
 # BEGIN: deepfreeze modules
-Python/deepfreeze/deepfreeze.c: $(DEEPFREEZE_DEPS)
+Python/deepfreeze/deepfreeze_bootstrap.c: $(DEEPFREEZE_DEPS) $(FROZEN_FILES_BOOTSTRAP_OUT)
 	$(PYTHON_FOR_FREEZE) $(srcdir)/Tools/scripts/deepfreeze.py \
 	Python/frozen_modules/importlib._bootstrap.h:importlib._bootstrap \
 	Python/frozen_modules/importlib._bootstrap_external.h:importlib._bootstrap_external \
 	Python/frozen_modules/zipimport.h:zipimport \
+	-o Python/deepfreeze/deepfreeze_bootstrap.c
+
+Python/deepfreeze/deepfreeze_stdlib.c: $(DEEPFREEZE_DEPS) $(FROZEN_FILES_STDLIB_OUT)
+	$(PYTHON_FOR_FREEZE) $(srcdir)/Tools/scripts/deepfreeze.py \
 	Python/frozen_modules/abc.h:abc \
 	Python/frozen_modules/codecs.h:codecs \
 	Python/frozen_modules/io.h:io \
@@ -1164,7 +1171,7 @@ Python/deepfreeze/deepfreeze.c: $(DEEPFREEZE_DEPS)
 	Python/frozen_modules/__phello__.ham.eggs.h:__phello__.ham.eggs \
 	Python/frozen_modules/__phello__.spam.h:__phello__.spam \
 	Python/frozen_modules/frozen_only.h:frozen_only \
-	-o Python/deepfreeze/deepfreeze.c
+	-o Python/deepfreeze/deepfreeze_stdlib.c
 
 # END: deepfreeze modules
 
@@ -1393,7 +1400,7 @@ regen-opcode-targets:
 Python/ceval.o: $(srcdir)/Python/opcode_targets.h $(srcdir)/Python/ceval_gil.h \
 		$(srcdir)/Python/condvar.h
 
-Python/frozen.o: $(FROZEN_FILES_OUT)
+Python/frozen.o: $(DEEPFREEZE_OBJS)
 
 # Generate DTrace probe macros, then rename them (PYTHON_ -> PyDTrace_) to
 # follow our naming conventions. dtrace(1) uses the output filename to generate

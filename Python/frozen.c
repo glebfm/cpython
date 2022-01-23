@@ -38,10 +38,13 @@
 #include "Python.h"
 #include "pycore_import.h"
 
+#define PY_FROZEN_STDLIB 1
+
 /* Includes for frozen modules: */
 #include "frozen_modules/importlib._bootstrap.h"
 #include "frozen_modules/importlib._bootstrap_external.h"
 #include "frozen_modules/zipimport.h"
+#ifdef PY_FROZEN_STDLIB
 #include "frozen_modules/abc.h"
 #include "frozen_modules/codecs.h"
 #include "frozen_modules/io.h"
@@ -62,6 +65,7 @@
 #include "frozen_modules/__phello__.ham.eggs.h"
 #include "frozen_modules/__phello__.spam.h"
 #include "frozen_modules/frozen_only.h"
+#endif
 /* End includes */
 
 #define GET_CODE(name) _Py_get_##name##_toplevel
@@ -70,6 +74,7 @@
 extern PyObject *_Py_get_importlib__bootstrap_toplevel(void);
 extern PyObject *_Py_get_importlib__bootstrap_external_toplevel(void);
 extern PyObject *_Py_get_zipimport_toplevel(void);
+#ifdef PY_FROZEN_STDLIB
 extern PyObject *_Py_get_abc_toplevel(void);
 extern PyObject *_Py_get_codecs_toplevel(void);
 extern PyObject *_Py_get_io_toplevel(void);
@@ -96,6 +101,7 @@ extern PyObject *_Py_get___phello___ham_toplevel(void);
 extern PyObject *_Py_get___phello___ham_eggs_toplevel(void);
 extern PyObject *_Py_get___phello___spam_toplevel(void);
 extern PyObject *_Py_get_frozen_only_toplevel(void);
+#endif
 /* End extern declarations */
 
 /* Note that a negative size indicates a package. */
@@ -107,6 +113,7 @@ static const struct _frozen bootstrap_modules[] = {
     {0, 0, 0} /* bootstrap sentinel */
 };
 static const struct _frozen stdlib_modules[] = {
+#ifdef PY_FROZEN_STDLIB
     /* stdlib - startup, without site (python -S) */
     {"abc", _Py_M__abc, (int)sizeof(_Py_M__abc), GET_CODE(abc)},
     {"codecs", _Py_M__codecs, (int)sizeof(_Py_M__codecs), GET_CODE(codecs)},
@@ -127,9 +134,11 @@ static const struct _frozen stdlib_modules[] = {
     {"importlib.util", _Py_M__importlib_util, (int)sizeof(_Py_M__importlib_util), GET_CODE(importlib_util)},
     {"importlib.machinery", _Py_M__importlib_machinery, (int)sizeof(_Py_M__importlib_machinery), GET_CODE(importlib_machinery)},
     {"runpy", _Py_M__runpy, (int)sizeof(_Py_M__runpy), GET_CODE(runpy)},
+#endif
     {0, 0, 0} /* stdlib sentinel */
 };
 static const struct _frozen test_modules[] = {
+#ifdef PY_FROZEN_STDLIB
     {"__hello__", _Py_M____hello__, (int)sizeof(_Py_M____hello__), GET_CODE(__hello__)},
     {"__hello_alias__", _Py_M____hello__, (int)sizeof(_Py_M____hello__), GET_CODE(__hello__)},
     {"__phello_alias__", _Py_M____hello__, -(int)sizeof(_Py_M____hello__), GET_CODE(__hello__)},
@@ -141,6 +150,7 @@ static const struct _frozen test_modules[] = {
     {"__phello__.ham.eggs", _Py_M____phello___ham_eggs, (int)sizeof(_Py_M____phello___ham_eggs), GET_CODE(__phello___ham_eggs)},
     {"__phello__.spam", _Py_M____phello___spam, (int)sizeof(_Py_M____phello___spam), GET_CODE(__phello___spam)},
     {"__hello_only__", _Py_M__frozen_only, (int)sizeof(_Py_M__frozen_only), GET_CODE(frozen_only)},
+#endif
     {0, 0, 0} /* test sentinel */
 };
 const struct _frozen *_PyImport_FrozenBootstrap = bootstrap_modules;
@@ -150,6 +160,7 @@ const struct _frozen *_PyImport_FrozenTest = test_modules;
 static const struct _module_alias aliases[] = {
     {"_frozen_importlib", "importlib._bootstrap"},
     {"_frozen_importlib_external", "importlib._bootstrap_external"},
+#ifdef PY_FROZEN_STDLIB
     {"os.path", "posixpath"},
     {"__hello_alias__", "__hello__"},
     {"__phello_alias__", "__hello__"},
@@ -157,6 +168,7 @@ static const struct _module_alias aliases[] = {
     {"__phello__.__init__", "<__phello__"},
     {"__phello__.ham.__init__", "<__phello__.ham"},
     {"__hello_only__", NULL},
+#endif
     {0, 0} /* aliases sentinel */
 };
 const struct _module_alias *_PyImport_FrozenAliases = aliases;
