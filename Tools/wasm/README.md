@@ -69,3 +69,12 @@ or
 ```shell
 python3 -m http.server
 ```
+
+### WASM standalone
+
+```
+ac_cv_func_getentropy=no
+ac_cv_func_system=no
+ac_cv_func_getloadavg=no
+ac_cv_func_utimes=no
+```

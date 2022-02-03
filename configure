@@ -1756,7 +1756,7 @@ Optional Packages:
   --with-cxx-main[=COMPILER]
                           compile main() and link Python executable with C++
                           compiler specified in COMPILER (default is $CXX)
-  --with-emscripten-target=[browser|node]
+  --with-emscripten-target=[browser|node|standalone]
                           Emscripten platform
   --with-suffix=SUFFIX    set executable suffix to SUFFIX (default is empty,
                           yes is mapped to '.exe')
@@ -6230,8 +6230,10 @@ if test "${with_emscripten_target+set}" = set; then :
     ac_sys_emscripten_target=browser ;; #(
   node) :
     ac_sys_emscripten_target=node ;; #(
+  standalone) :
+    ac_sys_emscripten_target=standalone ;; #(
   *) :
-    as_fn_error $? "Invalid argument: --with-emscripten-target=browser|node" "$LINENO" 5
+    as_fn_error $? "Invalid argument: --with-emscripten-target=browser|node|standalone" "$LINENO" 5
      ;;
 esac
 
@@ -6275,6 +6277,8 @@ else
     EXEEXT=.html ;; #(
   Emscripten/node) :
     EXEEXT=.js ;; #(
+  Emscripten/standalone) :
+    EXEEXT=.wasm ;; #(
   WASI/*) :
     EXEEXT=.wasm ;; #(
   *) :
@@ -7726,6 +7730,10 @@ case $ac_sys_system/$ac_sys_emscripten_target in #(
 
     LDFLAGS_NODIST="$LDFLAGS_NODIST -s ASSERTIONS=1 -s ALLOW_MEMORY_GROWTH=1 -s NODERAWFS=1 -s EXIT_RUNTIME=1 -s USE_PTHREADS -s PROXY_TO_PTHREAD"
     CFLAGS_NODIST="$CFLAGS_NODIST -pthread"
+   ;; #(
+  Emscripten/standalone) :
+
+        LDFLAGS_NODIST="$LDFLAGS_NODIST -s ASSERTIONS=1 -s ALLOW_MEMORY_GROWTH=1 -s STANDALONE_WASM=1"
    ;; #(
   WASI/*) :
 
@@ -21335,6 +21343,10 @@ case $ac_sys_system/$ac_sys_emscripten_target in #(
       Emscripten/node) :
 
     py_stdlib_not_available="_ctypes _curses _curses_panel _dbm _gdbm _scproxy _tkinter _xxsubinterpreters grp nis ossaudiodev spwd syslog"
+   ;; #(
+  Emscripten/standalone) :
+
+    py_stdlib_not_available="_socket _ctypes _curses _curses_panel _dbm _gdbm _scproxy _tkinter _xxsubinterpreters grp nis ossaudiodev spwd syslog"
    ;; #(
   *) :
     py_stdlib_not_available="_scproxy"

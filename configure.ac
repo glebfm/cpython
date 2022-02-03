@@ -1069,13 +1069,14 @@ AS_CASE([$ac_sys_system/$ac_sys_release],
 
 AC_MSG_CHECKING([for --with-emscripten-target])
 AC_ARG_WITH([emscripten-target],
-  [AS_HELP_STRING([--with-emscripten-target=@<:@browser|node@:>@], [Emscripten platform])],
+  [AS_HELP_STRING([--with-emscripten-target=@<:@browser|node|standalone@:>@], [Emscripten platform])],
 [
 	AS_VAR_IF([ac_sys_system], [Emscripten], [
     AS_CASE([$with_emscripten_target],
       [browser], [ac_sys_emscripten_target=browser],
       [node], [ac_sys_emscripten_target=node],
-      [AC_MSG_ERROR([Invalid argument: --with-emscripten-target=browser|node])]
+      [standalone], [ac_sys_emscripten_target=standalone],
+      [AC_MSG_ERROR([Invalid argument: --with-emscripten-target=browser|node|standalone])]
     )
   ], [
     AC_MSG_ERROR([--with-emscripten-target only applies to Emscripten])
@@ -1098,6 +1099,7 @@ AC_ARG_WITH([suffix],
   AS_CASE([$ac_sys_system/$ac_sys_emscripten_target],
     [Emscripten/browser], [EXEEXT=.html],
     [Emscripten/node], [EXEEXT=.js],
+    [Emscripten/standalone], [EXEEXT=.wasm],
     [WASI/*], [EXEEXT=.wasm],
     [EXEEXT=]
   )
@@ -1870,6 +1872,10 @@ AS_CASE([$ac_sys_system/$ac_sys_emscripten_target],
   [Emscripten/node], [
     LDFLAGS_NODIST="$LDFLAGS_NODIST -s ASSERTIONS=1 -s ALLOW_MEMORY_GROWTH=1 -s NODERAWFS=1 -s EXIT_RUNTIME=1 -s USE_PTHREADS -s PROXY_TO_PTHREAD"
     CFLAGS_NODIST="$CFLAGS_NODIST -pthread"
+  ],
+  [Emscripten/standalone], [
+    dnl no pthread support yet
+    LDFLAGS_NODIST="$LDFLAGS_NODIST -s ASSERTIONS=1 -s ALLOW_MEMORY_GROWTH=1 -s STANDALONE_WASM=1"
   ],
   [WASI/*], [
     AC_DEFINE([_WASI_EMULATED_SIGNAL], [1], [Define to 1 if you want to emulate signals on WASI])
@@ -6398,6 +6404,24 @@ AS_CASE([$ac_sys_system/$ac_sys_emscripten_target],
   dnl so imports in tests do not fail.
   [Emscripten/node], [
     py_stdlib_not_available="m4_normalize([
+      _ctypes
+      _curses
+      _curses_panel
+      _dbm
+      _gdbm
+      _scproxy
+      _tkinter
+      _xxsubinterpreters
+      grp
+      nis
+      ossaudiodev
+      spwd
+      syslog
+    ])"
+  ],
+  [Emscripten/standalone], [
+    py_stdlib_not_available="m4_normalize([
+      _socket
       _ctypes
       _curses
       _curses_panel
