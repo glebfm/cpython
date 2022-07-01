@@ -1045,11 +1045,16 @@ class ContextTests(unittest.TestCase):
         ctx = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
         self.assertRaises(TypeError, ctx.load_verify_locations, cadata=object)
 
-        with self.assertRaisesRegexp(ssl.SSLError, "no start line"):
+        with self.assertRaisesRegexp(
+            ssl.SSLError,
+            "no start line: cadata does not contain a certificate"
+        ):
             ctx.load_verify_locations(cadata=u"broken")
-        with self.assertRaisesRegexp(ssl.SSLError, "not enough data"):
+        with self.assertRaisesRegexp(
+            ssl.SSLError,
+            "not enough data: cadata does not contain a certificate"
+        ):
             ctx.load_verify_locations(cadata=b"broken")
-
 
     def test_load_dh_params(self):
         filename = u'dhpäräm.pem'
