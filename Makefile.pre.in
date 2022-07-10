@@ -315,6 +315,8 @@ COVERAGE_REPORT=$(abs_builddir)/lcov-report
 COVERAGE_LCOV_OPTIONS=--rc lcov_branch_coverage=1
 COVERAGE_REPORT_OPTIONS=--rc lcov_branch_coverage=1 --branch-coverage --title "CPython $(VERSION) LCOV report [commit $(shell $(GITVERSION))]"
 
+# empty variable
+NULL=
 
 # === Definitions added by makesetup ===
 
@@ -1001,7 +1003,8 @@ FROZEN_FILES_IN = \
 		Lib/__phello__/ham/__init__.py \
 		Lib/__phello__/ham/eggs.py \
 		Lib/__phello__/spam.py \
-		Tools/freeze/flag.py
+		Tools/freeze/flag.py \
+		$(NULL)
 # End FROZEN_FILES_IN
 FROZEN_FILES_OUT = \
 		Python/frozen_modules/importlib._bootstrap.h \
@@ -1026,7 +1029,8 @@ FROZEN_FILES_OUT = \
 		Python/frozen_modules/__phello__.ham.h \
 		Python/frozen_modules/__phello__.ham.eggs.h \
 		Python/frozen_modules/__phello__.spam.h \
-		Python/frozen_modules/frozen_only.h
+		Python/frozen_modules/frozen_only.h \
+		$(NULL)
 # End FROZEN_FILES_OUT
 
 Programs/_freeze_module.o: Programs/_freeze_module.c Makefile
@@ -1126,35 +1130,159 @@ regen-frozen: Tools/scripts/freeze_modules.py $(FROZEN_FILES_IN)
 .PHONY: regen-deepfreeze
 regen-deepfreeze: $(DEEPFREEZE_OBJS)
 
-DEEPFREEZE_DEPS=$(srcdir)/Tools/scripts/deepfreeze.py $(FREEZE_MODULE_DEPS) $(FROZEN_FILES_OUT)
+DEEPFREEZE_INCLUDE_DEPS=$(srcdir)/Tools/scripts/deepfreeze.py $(FREEZE_MODULE_DEPS)
+
+DEEPFROZEN_INCLUDE_FILES = \
+		Python/deepfreeze/importlib._bootstrap.inc \
+		Python/deepfreeze/importlib._bootstrap_external.inc \
+		Python/deepfreeze/zipimport.inc \
+		Python/deepfreeze/abc.inc \
+		Python/deepfreeze/codecs.inc \
+		Python/deepfreeze/io.inc \
+		Python/deepfreeze/_collections_abc.inc \
+		Python/deepfreeze/_sitebuiltins.inc \
+		Python/deepfreeze/genericpath.inc \
+		Python/deepfreeze/ntpath.inc \
+		Python/deepfreeze/posixpath.inc \
+		Python/deepfreeze/os.inc \
+		Python/deepfreeze/site.inc \
+		Python/deepfreeze/stat.inc \
+		Python/deepfreeze/importlib.util.inc \
+		Python/deepfreeze/importlib.machinery.inc \
+		Python/deepfreeze/runpy.inc \
+		Python/deepfreeze/__hello__.inc \
+		Python/deepfreeze/__phello__.inc \
+		Python/deepfreeze/__phello__.ham.inc \
+		Python/deepfreeze/__phello__.ham.eggs.inc \
+		Python/deepfreeze/__phello__.spam.inc \
+		Python/deepfreeze/frozen_only.inc \
+		$(NULL)
+# END: DEEPFROZEN_INCLUDE_FILES
+
+# BEGIN: deepfreeze includes
+Python/deepfreeze/importlib._bootstrap.inc: Python/frozen_modules/importlib._bootstrap.h $(DEEPFREEZE_INCLUDE_DEPS)
+	$(PYTHON_FOR_FREEZE) $(srcdir)/Tools/scripts/deepfreeze.py include \
+	    importlib._bootstrap Python/frozen_modules/importlib._bootstrap.h Python/deepfreeze/importlib._bootstrap.inc
+
+Python/deepfreeze/importlib._bootstrap_external.inc: Python/frozen_modules/importlib._bootstrap_external.h $(DEEPFREEZE_INCLUDE_DEPS)
+	$(PYTHON_FOR_FREEZE) $(srcdir)/Tools/scripts/deepfreeze.py include \
+	    importlib._bootstrap_external Python/frozen_modules/importlib._bootstrap_external.h Python/deepfreeze/importlib._bootstrap_external.inc
+
+Python/deepfreeze/zipimport.inc: Python/frozen_modules/zipimport.h $(DEEPFREEZE_INCLUDE_DEPS)
+	$(PYTHON_FOR_FREEZE) $(srcdir)/Tools/scripts/deepfreeze.py include \
+	    zipimport Python/frozen_modules/zipimport.h Python/deepfreeze/zipimport.inc
+
+Python/deepfreeze/abc.inc: Python/frozen_modules/abc.h $(DEEPFREEZE_INCLUDE_DEPS)
+	$(PYTHON_FOR_FREEZE) $(srcdir)/Tools/scripts/deepfreeze.py include \
+	    abc Python/frozen_modules/abc.h Python/deepfreeze/abc.inc
+
+Python/deepfreeze/codecs.inc: Python/frozen_modules/codecs.h $(DEEPFREEZE_INCLUDE_DEPS)
+	$(PYTHON_FOR_FREEZE) $(srcdir)/Tools/scripts/deepfreeze.py include \
+	    codecs Python/frozen_modules/codecs.h Python/deepfreeze/codecs.inc
+
+Python/deepfreeze/io.inc: Python/frozen_modules/io.h $(DEEPFREEZE_INCLUDE_DEPS)
+	$(PYTHON_FOR_FREEZE) $(srcdir)/Tools/scripts/deepfreeze.py include \
+	    io Python/frozen_modules/io.h Python/deepfreeze/io.inc
+
+Python/deepfreeze/_collections_abc.inc: Python/frozen_modules/_collections_abc.h $(DEEPFREEZE_INCLUDE_DEPS)
+	$(PYTHON_FOR_FREEZE) $(srcdir)/Tools/scripts/deepfreeze.py include \
+	    _collections_abc Python/frozen_modules/_collections_abc.h Python/deepfreeze/_collections_abc.inc
+
+Python/deepfreeze/_sitebuiltins.inc: Python/frozen_modules/_sitebuiltins.h $(DEEPFREEZE_INCLUDE_DEPS)
+	$(PYTHON_FOR_FREEZE) $(srcdir)/Tools/scripts/deepfreeze.py include \
+	    _sitebuiltins Python/frozen_modules/_sitebuiltins.h Python/deepfreeze/_sitebuiltins.inc
+
+Python/deepfreeze/genericpath.inc: Python/frozen_modules/genericpath.h $(DEEPFREEZE_INCLUDE_DEPS)
+	$(PYTHON_FOR_FREEZE) $(srcdir)/Tools/scripts/deepfreeze.py include \
+	    genericpath Python/frozen_modules/genericpath.h Python/deepfreeze/genericpath.inc
+
+Python/deepfreeze/ntpath.inc: Python/frozen_modules/ntpath.h $(DEEPFREEZE_INCLUDE_DEPS)
+	$(PYTHON_FOR_FREEZE) $(srcdir)/Tools/scripts/deepfreeze.py include \
+	    ntpath Python/frozen_modules/ntpath.h Python/deepfreeze/ntpath.inc
+
+Python/deepfreeze/posixpath.inc: Python/frozen_modules/posixpath.h $(DEEPFREEZE_INCLUDE_DEPS)
+	$(PYTHON_FOR_FREEZE) $(srcdir)/Tools/scripts/deepfreeze.py include \
+	    posixpath Python/frozen_modules/posixpath.h Python/deepfreeze/posixpath.inc
+
+Python/deepfreeze/os.inc: Python/frozen_modules/os.h $(DEEPFREEZE_INCLUDE_DEPS)
+	$(PYTHON_FOR_FREEZE) $(srcdir)/Tools/scripts/deepfreeze.py include \
+	    os Python/frozen_modules/os.h Python/deepfreeze/os.inc
+
+Python/deepfreeze/site.inc: Python/frozen_modules/site.h $(DEEPFREEZE_INCLUDE_DEPS)
+	$(PYTHON_FOR_FREEZE) $(srcdir)/Tools/scripts/deepfreeze.py include \
+	    site Python/frozen_modules/site.h Python/deepfreeze/site.inc
+
+Python/deepfreeze/stat.inc: Python/frozen_modules/stat.h $(DEEPFREEZE_INCLUDE_DEPS)
+	$(PYTHON_FOR_FREEZE) $(srcdir)/Tools/scripts/deepfreeze.py include \
+	    stat Python/frozen_modules/stat.h Python/deepfreeze/stat.inc
+
+Python/deepfreeze/importlib.util.inc: Python/frozen_modules/importlib.util.h $(DEEPFREEZE_INCLUDE_DEPS)
+	$(PYTHON_FOR_FREEZE) $(srcdir)/Tools/scripts/deepfreeze.py include \
+	    importlib.util Python/frozen_modules/importlib.util.h Python/deepfreeze/importlib.util.inc
+
+Python/deepfreeze/importlib.machinery.inc: Python/frozen_modules/importlib.machinery.h $(DEEPFREEZE_INCLUDE_DEPS)
+	$(PYTHON_FOR_FREEZE) $(srcdir)/Tools/scripts/deepfreeze.py include \
+	    importlib.machinery Python/frozen_modules/importlib.machinery.h Python/deepfreeze/importlib.machinery.inc
+
+Python/deepfreeze/runpy.inc: Python/frozen_modules/runpy.h $(DEEPFREEZE_INCLUDE_DEPS)
+	$(PYTHON_FOR_FREEZE) $(srcdir)/Tools/scripts/deepfreeze.py include \
+	    runpy Python/frozen_modules/runpy.h Python/deepfreeze/runpy.inc
+
+Python/deepfreeze/__hello__.inc: Python/frozen_modules/__hello__.h $(DEEPFREEZE_INCLUDE_DEPS)
+	$(PYTHON_FOR_FREEZE) $(srcdir)/Tools/scripts/deepfreeze.py include \
+	    __hello__ Python/frozen_modules/__hello__.h Python/deepfreeze/__hello__.inc
+
+Python/deepfreeze/__phello__.inc: Python/frozen_modules/__phello__.h $(DEEPFREEZE_INCLUDE_DEPS)
+	$(PYTHON_FOR_FREEZE) $(srcdir)/Tools/scripts/deepfreeze.py include \
+	    __phello__ Python/frozen_modules/__phello__.h Python/deepfreeze/__phello__.inc
+
+Python/deepfreeze/__phello__.ham.inc: Python/frozen_modules/__phello__.ham.h $(DEEPFREEZE_INCLUDE_DEPS)
+	$(PYTHON_FOR_FREEZE) $(srcdir)/Tools/scripts/deepfreeze.py include \
+	    __phello__.ham Python/frozen_modules/__phello__.ham.h Python/deepfreeze/__phello__.ham.inc
+
+Python/deepfreeze/__phello__.ham.eggs.inc: Python/frozen_modules/__phello__.ham.eggs.h $(DEEPFREEZE_INCLUDE_DEPS)
+	$(PYTHON_FOR_FREEZE) $(srcdir)/Tools/scripts/deepfreeze.py include \
+	    __phello__.ham.eggs Python/frozen_modules/__phello__.ham.eggs.h Python/deepfreeze/__phello__.ham.eggs.inc
+
+Python/deepfreeze/__phello__.spam.inc: Python/frozen_modules/__phello__.spam.h $(DEEPFREEZE_INCLUDE_DEPS)
+	$(PYTHON_FOR_FREEZE) $(srcdir)/Tools/scripts/deepfreeze.py include \
+	    __phello__.spam Python/frozen_modules/__phello__.spam.h Python/deepfreeze/__phello__.spam.inc
+
+Python/deepfreeze/frozen_only.inc: Python/frozen_modules/frozen_only.h $(DEEPFREEZE_INCLUDE_DEPS)
+	$(PYTHON_FOR_FREEZE) $(srcdir)/Tools/scripts/deepfreeze.py include \
+	    frozen_only Python/frozen_modules/frozen_only.h Python/deepfreeze/frozen_only.inc
+
+# END: deepfreeze includes
+
+DEEPFREEZE_DEPS=$(srcdir)/Tools/scripts/deepfreeze.py $(FREEZE_MODULE_DEPS) $(DEEPFROZEN_INCLUDE_FILES)
 
 # BEGIN: deepfreeze modules
 Python/deepfreeze/deepfreeze.c: $(DEEPFREEZE_DEPS)
-	$(PYTHON_FOR_FREEZE) $(srcdir)/Tools/scripts/deepfreeze.py \
-	Python/frozen_modules/importlib._bootstrap.h:importlib._bootstrap \
-	Python/frozen_modules/importlib._bootstrap_external.h:importlib._bootstrap_external \
-	Python/frozen_modules/zipimport.h:zipimport \
-	Python/frozen_modules/abc.h:abc \
-	Python/frozen_modules/codecs.h:codecs \
-	Python/frozen_modules/io.h:io \
-	Python/frozen_modules/_collections_abc.h:_collections_abc \
-	Python/frozen_modules/_sitebuiltins.h:_sitebuiltins \
-	Python/frozen_modules/genericpath.h:genericpath \
-	Python/frozen_modules/ntpath.h:ntpath \
-	Python/frozen_modules/posixpath.h:posixpath \
-	Python/frozen_modules/os.h:os \
-	Python/frozen_modules/site.h:site \
-	Python/frozen_modules/stat.h:stat \
-	Python/frozen_modules/importlib.util.h:importlib.util \
-	Python/frozen_modules/importlib.machinery.h:importlib.machinery \
-	Python/frozen_modules/runpy.h:runpy \
-	Python/frozen_modules/__hello__.h:__hello__ \
-	Python/frozen_modules/__phello__.h:__phello__ \
-	Python/frozen_modules/__phello__.ham.h:__phello__.ham \
-	Python/frozen_modules/__phello__.ham.eggs.h:__phello__.ham.eggs \
-	Python/frozen_modules/__phello__.spam.h:__phello__.spam \
-	Python/frozen_modules/frozen_only.h:frozen_only \
-	-o Python/deepfreeze/deepfreeze.c
+	$(PYTHON_FOR_FREEZE) $(srcdir)/Tools/scripts/deepfreeze.py deepfreeze \
+	    Python/deepfreeze/importlib._bootstrap.inc:importlib._bootstrap \
+	    Python/deepfreeze/importlib._bootstrap_external.inc:importlib._bootstrap_external \
+	    Python/deepfreeze/zipimport.inc:zipimport \
+	    Python/deepfreeze/abc.inc:abc \
+	    Python/deepfreeze/codecs.inc:codecs \
+	    Python/deepfreeze/io.inc:io \
+	    Python/deepfreeze/_collections_abc.inc:_collections_abc \
+	    Python/deepfreeze/_sitebuiltins.inc:_sitebuiltins \
+	    Python/deepfreeze/genericpath.inc:genericpath \
+	    Python/deepfreeze/ntpath.inc:ntpath \
+	    Python/deepfreeze/posixpath.inc:posixpath \
+	    Python/deepfreeze/os.inc:os \
+	    Python/deepfreeze/site.inc:site \
+	    Python/deepfreeze/stat.inc:stat \
+	    Python/deepfreeze/importlib.util.inc:importlib.util \
+	    Python/deepfreeze/importlib.machinery.inc:importlib.machinery \
+	    Python/deepfreeze/runpy.inc:runpy \
+	    Python/deepfreeze/__hello__.inc:__hello__ \
+	    Python/deepfreeze/__phello__.inc:__phello__ \
+	    Python/deepfreeze/__phello__.ham.inc:__phello__.ham \
+	    Python/deepfreeze/__phello__.ham.eggs.inc:__phello__.ham.eggs \
+	    Python/deepfreeze/__phello__.spam.inc:__phello__.spam \
+	    Python/deepfreeze/frozen_only.inc:frozen_only \
+	    -o Python/deepfreeze/deepfreeze.c
 # END: deepfreeze modules
 	@echo "Note: Deepfreeze may have added some global objects,"
 	@echo "      so run 'make regen-global-objects' if necessary."
@@ -2393,7 +2521,7 @@ clean-retain-profile: pycremoval
 	-rm -f python.html python*.js python.data python*.symbols python*.map
 	-rm -f $(WASM_STDLIB)
 	-rm -f Programs/_testembed Programs/_freeze_module
-	-rm -f Python/deepfreeze/*.[co]
+	-rm -f Python/deepfreeze/*.[co] Python/deepfreeze/*.inc
 	-rm -f Python/frozen_modules/*.h
 	-rm -f Python/frozen_modules/MANIFEST
 	-find build -type f -a ! -name '*.gc??' -exec rm -f {} ';'

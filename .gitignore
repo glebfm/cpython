@@ -124,6 +124,7 @@ Tools/unicode/data/
 /profile-clean-stamp
 /profile-run-stamp
 /Python/deepfreeze/*.c
+/Python/deepfreeze/*.inc
 /pybuilddir.txt
 /pyconfig.h
 /python-config

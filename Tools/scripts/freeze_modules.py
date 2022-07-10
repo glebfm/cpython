@@ -234,8 +234,8 @@ class FrozenSource(namedtuple('FrozenSource', 'id pyfile frozenfile deepfreezefi
         if not pyfile:
             pyfile = os.path.join(STDLIB_DIR, *frozenid.split('.')) + '.py'
             #assert os.path.exists(pyfile), (frozenid, pyfile)
-        frozenfile = resolve_frozen_file(frozenid, FROZEN_MODULES_DIR)
-        deepfreezefile = resolve_frozen_file(frozenid, DEEPFROZEN_MODULES_DIR)
+        frozenfile = resolve_frozen_file(frozenid, FROZEN_MODULES_DIR, ".h")
+        deepfreezefile = resolve_frozen_file(frozenid, DEEPFROZEN_MODULES_DIR, ".inc")
         return cls(frozenid, pyfile, frozenfile, deepfreezefile)
 
     @property
@@ -268,7 +268,7 @@ class FrozenSource(namedtuple('FrozenSource', 'id pyfile frozenfile deepfreezefi
         return self.id in BOOTSTRAP
 
 
-def resolve_frozen_file(frozenid, destdir):
+def resolve_frozen_file(frozenid, destdir, suffix):
     """Return the filename corresponding to the given frozen ID.
 
     For stdlib modules the ID will always be the full name
@@ -280,7 +280,7 @@ def resolve_frozen_file(frozenid, destdir):
         except AttributeError:
             raise ValueError(f'unsupported frozenid {frozenid!r}')
     # We use a consistent naming convention for all frozen modules.
-    frozenfile = f'{frozenid}.h'
+    frozenfile = f'{frozenid}{suffix}'
     if not destdir:
         return frozenfile
     return os.path.join(destdir, frozenfile)
@@ -579,15 +579,20 @@ def regen_frozen(modules, frozen_modules: bool):
 def regen_makefile(modules):
     pyfiles = []
     frozenfiles = []
+    deepfrozenfiles = []
     rules = ['']
+    deepfreeze_include_rules = []
     deepfreezerules = ["Python/deepfreeze/deepfreeze.c: $(DEEPFREEZE_DEPS)",
-                       "\t$(PYTHON_FOR_FREEZE) $(srcdir)/Tools/scripts/deepfreeze.py \\"]
+                       "\t$(PYTHON_FOR_FREEZE) $(srcdir)/Tools/scripts/deepfreeze.py deepfreeze \\"]
     for src in _iter_sources(modules):
         frozen_header = relpath_for_posix_display(src.frozenfile, ROOT_DIR)
         frozenfiles.append(f'\t\t{frozen_header} \\')
 
         pyfile = relpath_for_posix_display(src.pyfile, ROOT_DIR)
         pyfiles.append(f'\t\t{pyfile} \\')
+
+        deepfrozen_include = relpath_for_posix_display(src.deepfreezefile, ROOT_DIR)
+        deepfrozenfiles.append(f'\t\t{deepfrozen_include} \\')
 
         if src.isbootstrap:
             freezecmd = '$(FREEZE_MODULE_BOOTSTRAP)'
@@ -603,10 +608,17 @@ def regen_makefile(modules):
             f'\t{freeze}',
             '',
         ])
-        deepfreezerules.append(f"\t{frozen_header}:{src.frozenid} \\")
-    deepfreezerules.append('\t-o Python/deepfreeze/deepfreeze.c')
-    pyfiles[-1] = pyfiles[-1].rstrip(" \\")
-    frozenfiles[-1] = frozenfiles[-1].rstrip(" \\")
+        deepfreeze_include_rules.extend([
+            f"{deepfrozen_include}: {frozen_header} $(DEEPFREEZE_INCLUDE_DEPS)",
+            f"\t$(PYTHON_FOR_FREEZE) $(srcdir)/Tools/scripts/deepfreeze.py include \\",
+            f"\t    {src.frozenid} {frozen_header} {deepfrozen_include}",
+            ""
+        ])
+        deepfreezerules.append(f"\t    {deepfrozen_include}:{src.frozenid} \\")
+    deepfreezerules.append('\t    -o Python/deepfreeze/deepfreeze.c')
+    pyfiles.append("\t\t$(NULL)")
+    frozenfiles.append("\t\t$(NULL)")
+    deepfrozenfiles.append("\t\t$(NULL)")
 
     print(f'# Updating {os.path.relpath(MAKEFILE)}')
     with updating_file_with_tmpfile(MAKEFILE) as (infile, outfile):
@@ -630,6 +642,20 @@ def regen_makefile(modules):
             "# BEGIN: freezing modules",
             "# END: freezing modules",
             rules,
+            MAKEFILE,
+        )
+        lines = replace_block(
+            lines,
+            "DEEPFROZEN_INCLUDE_FILES =",
+            "# END: DEEPFROZEN_INCLUDE_FILES",
+            deepfrozenfiles,
+            MAKEFILE,
+        )
+        lines = replace_block(
+            lines,
+            "# BEGIN: deepfreeze includes",
+            "# END: deepfreeze includes",
+            deepfreeze_include_rules,
             MAKEFILE,
         )
         lines = replace_block(
