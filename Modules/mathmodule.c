@@ -295,6 +295,12 @@ m_inf(void)
 #endif
 }
 
+static PyObject*
+m_inf_o(PyObject *module)
+{
+    return PyFloat_FromDouble(m_inf());
+}
+
 /* Constant nan value, generated in the same way as float('nan'). */
 /* We don't currently assume that Py_NAN is defined everywhere. */
 
@@ -308,6 +314,12 @@ m_nan(void)
 #else
     return Py_NAN;
 #endif
+}
+
+static PyObject*
+m_nan_o(PyObject *module)
+{
+    return PyFloat_FromDouble(m_nan());
 }
 
 #endif
@@ -3853,24 +3865,6 @@ math_exec(PyObject *module)
     if (state->str___trunc__ == NULL) {
         return -1;
     }
-    if (PyModule_AddObject(module, "pi", PyFloat_FromDouble(Py_MATH_PI)) < 0) {
-        return -1;
-    }
-    if (PyModule_AddObject(module, "e", PyFloat_FromDouble(Py_MATH_E)) < 0) {
-        return -1;
-    }
-    // 2pi
-    if (PyModule_AddObject(module, "tau", PyFloat_FromDouble(Py_MATH_TAU)) < 0) {
-        return -1;
-    }
-    if (PyModule_AddObject(module, "inf", PyFloat_FromDouble(m_inf())) < 0) {
-        return -1;
-    }
-#if _PY_SHORT_FLOAT_REPR == 1
-    if (PyModule_AddObject(module, "nan", PyFloat_FromDouble(m_nan())) < 0) {
-        return -1;
-    }
-#endif
     return 0;
 }
 
@@ -3949,8 +3943,27 @@ static PyMethodDef math_methods[] = {
     {NULL,              NULL}           /* sentinel */
 };
 
+static PyModuleConst_Def math_constants[] = {
+    PyModuleConst_Double("pi", Py_MATH_PI),
+    PyModuleConst_Double("e", Py_MATH_E),
+    // 2pi
+    PyModuleConst_Double("tau", Py_MATH_TAU),
+    PyModuleConst_Call("inf", m_inf_o),
+#if !defined(PY_NO_SHORT_FLOAT_REPR) || defined(Py_NAN)
+    PyModuleConst_Call("nan", m_nan_o),
+#endif
+    {NULL, 0},
+};
+
+static int
+math_init_constants(PyObject *module)
+{
+    return PyModule_AddConstants(module, math_constants);
+}
+
 static PyModuleDef_Slot math_slots[] = {
     {Py_mod_exec, math_exec},
+    {Py_mod_exec, math_init_constants},
     {0, NULL}
 };
 

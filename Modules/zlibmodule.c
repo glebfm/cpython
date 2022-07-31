@@ -1555,14 +1555,9 @@ zlib_exec(PyObject *mod)
         return -1;
     }
 
-    state->ZlibError = PyErr_NewException("zlib.error", NULL, NULL);
+    state->ZlibError = PyModule_AddNewException(
+        mod, "zlib.error", NULL, NULL, NULL);
     if (state->ZlibError == NULL) {
-        return -1;
-    }
-
-    Py_INCREF(state->ZlibError);
-    if (PyModule_AddObject(mod, "error", state->ZlibError) < 0) {
-        Py_DECREF(state->ZlibError);
         return -1;
     }
 

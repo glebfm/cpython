@@ -71,6 +71,65 @@ struct PyModuleDef_Slot {
 
 #endif /* New in 3.5 */
 
+struct PyModuleConst_Def;
+#if !defined(Py_LIMITED_API) || Py_LIMITED_API+0 >= 0x03b00000
+/* New in 3.12 */
+enum _PyModuleConst_type {
+    _PyModuleConst_none_type = 1,
+    _PyModuleConst_long_type = 2,
+    _PyModuleConst_ulong_type = 3,
+    _PyModuleConst_bool_type = 4,
+    _PyModuleConst_double_type = 5,
+    _PyModuleConst_string_type = 6,
+    _PyModuleConst_call_type = 7,
+};
+
+typedef struct PyModuleConst_Def {
+    const char *name;
+    enum _PyModuleConst_type type;
+    union {
+        const char *m_str;
+        long m_long;
+        unsigned long m_ulong;
+        double m_double;
+        PyObject* (*m_call)(PyObject *module);
+        // unused, included to force alignment and size for future use.
+        long long m_long_long;
+#ifdef HAVE_LONG_DOUBLE
+        long double m_long_double;
+#endif
+#ifdef HAVE_GCC_UINT128_T
+        __uint128_t m_uint128;
+#endif
+#ifdef HAVE_GCC_FLOAT128_T
+        __float128_t m_float128;
+#endif
+    char __m[16]; // 128 bits
+    } value;
+} PyModuleConst_Def;
+
+PyAPI_FUNC(int) PyModule_AddConstants(PyObject *, PyModuleConst_Def *);
+
+#define PyModuleConst_None(name) \
+    {(name), _PyModuleConst_none_type, {.m_long=0}}
+#define PyModuleConst_Long(name, value) \
+    {(name), _PyModuleConst_long_type, {.m_long=(value)}}
+#define PyModuleConst_ULong(name, value) \
+    {(name), _PyModuleConst_ulong_type, {.m_ulong=(value)}}
+#define PyModuleConst_Bool(name, value) \
+    {(name), _PyModuleConst_bool_type, {.m_long=(value)}}
+#define PyModuleConst_Double(name, value) \
+    {(name), _PyModuleConst_double_type, {.m_double=(value)}}
+#define PyModuleConst_String(name, value) \
+    {(name), _PyModuleConst_string_type, {.m_str=(value)}}
+#define PyModuleConst_Call(name, value) \
+    {(name), _PyModuleConst_call_type, {.m_call=(value)}}
+
+#define PyModuleConst_LongMacro(m) PyModuleConst_Long(#m, m)
+#define PyModuleConst_StringMacro(m) PyModuleConst_String(#m, m)
+
+#endif /* New in 3.12 */
+
 struct PyModuleDef {
   PyModuleDef_Base m_base;
   const char* m_name;

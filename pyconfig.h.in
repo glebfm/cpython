@@ -444,6 +444,9 @@
    */
 #undef HAVE_GCC_ASM_FOR_X87
 
+/* Define if your compiler provides __float128_t */
+#undef HAVE_GCC_FLOAT128_T
+
 /* Define if your compiler provides __uint128_t */
 #undef HAVE_GCC_UINT128_T
 

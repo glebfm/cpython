@@ -2790,6 +2790,9 @@ AC_CHECK_TYPE(ssize_t,
   AC_DEFINE(HAVE_SSIZE_T, 1, [Define if your compiler provides ssize_t]),,)
 AC_CHECK_TYPE(__uint128_t,
   AC_DEFINE(HAVE_GCC_UINT128_T, 1, [Define if your compiler provides __uint128_t]),,)
+AC_CHECK_TYPE([__float128_t],
+  AC_DEFINE(HAVE_GCC_FLOAT128_T, 1, [Define if your compiler provides __float128_t]),,)
+
 
 # Sizes and alignments of various common basic types
 # ANSI C requires sizeof(char) == 1, so no need to check it

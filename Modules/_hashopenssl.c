@@ -2132,14 +2132,9 @@ hashlib_init_evptype(PyObject *module)
 {
     _hashlibstate *state = get_hashlib_state(module);
 
-    state->EVPtype = (PyTypeObject *)PyType_FromSpec(&EVPtype_spec);
-    if (state->EVPtype == NULL) {
-        return -1;
-    }
-    if (PyModule_AddType(module, state->EVPtype) < 0) {
-        return -1;
-    }
-    return 0;
+    state->EVPtype = PyModule_AddNewTypeFromSpec(
+        module, &EVPtype_spec, NULL);
+    return state->EVPtype == NULL ? -1 : 0;
 }
 
 static int
@@ -2151,16 +2146,9 @@ hashlib_init_evpxoftype(PyObject *module)
     if (state->EVPtype == NULL) {
         return -1;
     }
-
-    state->EVPXOFtype = (PyTypeObject *)PyType_FromSpecWithBases(
-        &EVPXOFtype_spec, (PyObject *)state->EVPtype
-    );
-    if (state->EVPXOFtype == NULL) {
-        return -1;
-    }
-    if (PyModule_AddType(module, state->EVPXOFtype) < 0) {
-        return -1;
-    }
+    state->EVPXOFtype = PyModule_AddNewTypeFromSpec(
+        module, &EVPXOFtype_spec, (PyObject *)state->EVPtype);
+    return state->EVPXOFtype == NULL ? -1 : 0;
 #endif
     return 0;
 }
@@ -2168,16 +2156,11 @@ hashlib_init_evpxoftype(PyObject *module)
 static int
 hashlib_init_hmactype(PyObject *module)
 {
-    _hashlibstate *state = get_hashlib_state(module);
+     _hashlibstate *state = get_hashlib_state(module);
 
-    state->HMACtype = (PyTypeObject *)PyType_FromSpec(&HMACtype_spec);
-    if (state->HMACtype == NULL) {
-        return -1;
-    }
-    if (PyModule_AddType(module, state->HMACtype) < 0) {
-        return -1;
-    }
-    return 0;
+    state->HMACtype = PyModule_AddNewTypeFromSpec(
+        module, &HMACtype_spec, NULL);
+    return state->HMACtype == NULL ? -1 : 0;
 }
 
 static int

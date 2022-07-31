@@ -9661,6 +9661,14 @@ $as_echo "#define HAVE_GCC_UINT128_T 1" >>confdefs.h
 
 fi
 
+ac_fn_c_check_type "$LINENO" "__float128_t" "ac_cv_type___float128_t" "$ac_includes_default"
+if test "x$ac_cv_type___float128_t" = xyes; then :
+
+$as_echo "#define HAVE_GCC_FLOAT128_T 1" >>confdefs.h
+
+fi
+
+
 
 # Sizes and alignments of various common basic types
 # ANSI C requires sizeof(char) == 1, so no need to check it

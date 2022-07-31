@@ -712,3 +712,44 @@ PyModule_AddType(PyObject *module, PyTypeObject *type)
 
     return PyModule_AddObjectRef(module, name, (PyObject *)type);
 }
+
+PyTypeObject *
+PyModule_AddNewTypeFromSpec(PyObject *module, PyType_Spec *spec,
+                            PyObject *bases)
+{
+    PyTypeObject *type;
+
+    type = (PyTypeObject *)PyType_FromModuleAndSpec(module, spec, bases);
+    if (type == NULL) {
+        return NULL;
+    }
+
+    if (PyModule_AddType(module, type) < 0) {
+        Py_DECREF(type);
+        return NULL;
+    }
+    return type;
+}
+
+PyObject *
+PyModule_AddNewException(PyObject *module, const char *name, const char *doc,
+                         PyObject *base, PyObject *dict)
+{
+    PyObject *exc = PyErr_NewExceptionWithDoc(name, doc, base, dict);
+    if (exc == NULL) {
+        return NULL;
+    }
+
+    const char *shortname = strrchr(name, '.');
+    if (shortname == NULL) {
+        shortname = name;
+    }
+    else {
+        shortname++;
+    }
+    if (PyModule_AddObjectRef(module, shortname, exc) < 0) {
+        Py_DECREF(exc);
+        return NULL;
+    }
+    return exc;
+}

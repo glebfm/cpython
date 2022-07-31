@@ -14926,84 +14926,6 @@ static PyMethodDef posix_methods[] = {
 static int
 all_ins(PyObject *m)
 {
-#ifdef F_OK
-    if (PyModule_AddIntMacro(m, F_OK)) return -1;
-#endif
-#ifdef R_OK
-    if (PyModule_AddIntMacro(m, R_OK)) return -1;
-#endif
-#ifdef W_OK
-    if (PyModule_AddIntMacro(m, W_OK)) return -1;
-#endif
-#ifdef X_OK
-    if (PyModule_AddIntMacro(m, X_OK)) return -1;
-#endif
-#ifdef NGROUPS_MAX
-    if (PyModule_AddIntMacro(m, NGROUPS_MAX)) return -1;
-#endif
-#ifdef TMP_MAX
-    if (PyModule_AddIntMacro(m, TMP_MAX)) return -1;
-#endif
-#ifdef WCONTINUED
-    if (PyModule_AddIntMacro(m, WCONTINUED)) return -1;
-#endif
-#ifdef WNOHANG
-    if (PyModule_AddIntMacro(m, WNOHANG)) return -1;
-#endif
-#ifdef WUNTRACED
-    if (PyModule_AddIntMacro(m, WUNTRACED)) return -1;
-#endif
-#ifdef O_RDONLY
-    if (PyModule_AddIntMacro(m, O_RDONLY)) return -1;
-#endif
-#ifdef O_WRONLY
-    if (PyModule_AddIntMacro(m, O_WRONLY)) return -1;
-#endif
-#ifdef O_RDWR
-    if (PyModule_AddIntMacro(m, O_RDWR)) return -1;
-#endif
-#ifdef O_NDELAY
-    if (PyModule_AddIntMacro(m, O_NDELAY)) return -1;
-#endif
-#ifdef O_NONBLOCK
-    if (PyModule_AddIntMacro(m, O_NONBLOCK)) return -1;
-#endif
-#ifdef O_APPEND
-    if (PyModule_AddIntMacro(m, O_APPEND)) return -1;
-#endif
-#ifdef O_DSYNC
-    if (PyModule_AddIntMacro(m, O_DSYNC)) return -1;
-#endif
-#ifdef O_RSYNC
-    if (PyModule_AddIntMacro(m, O_RSYNC)) return -1;
-#endif
-#ifdef O_SYNC
-    if (PyModule_AddIntMacro(m, O_SYNC)) return -1;
-#endif
-#ifdef O_NOCTTY
-    if (PyModule_AddIntMacro(m, O_NOCTTY)) return -1;
-#endif
-#ifdef O_CREAT
-    if (PyModule_AddIntMacro(m, O_CREAT)) return -1;
-#endif
-#ifdef O_EXCL
-    if (PyModule_AddIntMacro(m, O_EXCL)) return -1;
-#endif
-#ifdef O_TRUNC
-    if (PyModule_AddIntMacro(m, O_TRUNC)) return -1;
-#endif
-#ifdef O_BINARY
-    if (PyModule_AddIntMacro(m, O_BINARY)) return -1;
-#endif
-#ifdef O_TEXT
-    if (PyModule_AddIntMacro(m, O_TEXT)) return -1;
-#endif
-#ifdef O_XATTR
-    if (PyModule_AddIntMacro(m, O_XATTR)) return -1;
-#endif
-#ifdef O_LARGEFILE
-    if (PyModule_AddIntMacro(m, O_LARGEFILE)) return -1;
-#endif
 #ifndef __GNU__
 #ifdef O_SHLOCK
     if (PyModule_AddIntMacro(m, O_SHLOCK)) return -1;
@@ -15871,9 +15793,98 @@ posixmodule_exec(PyObject *m)
     return 0;
 }
 
+static PyModuleConst_Def posix_constants[] = {
+#ifdef F_OK
+    PyModuleConst_LongMacro(F_OK),
+#endif
+#ifdef R_OK
+    PyModuleConst_LongMacro(R_OK),
+#endif
+#ifdef W_OK
+    PyModuleConst_LongMacro(W_OK),
+#endif
+#ifdef X_OK
+    PyModuleConst_LongMacro(X_OK),
+#endif
+#ifdef NGROUPS_MAX
+    PyModuleConst_LongMacro(NGROUPS_MAX),
+#endif
+#ifdef TMP_MAX
+    PyModuleConst_LongMacro(TMP_MAX),
+#endif
+#ifdef WCONTINUED
+    PyModuleConst_LongMacro(WCONTINUED),
+#endif
+#ifdef WNOHANG
+    PyModuleConst_LongMacro(WNOHANG),
+#endif
+#ifdef WUNTRACED
+    PyModuleConst_LongMacro(WUNTRACED),
+#endif
+#ifdef O_RDONLY
+    PyModuleConst_LongMacro(O_RDONLY),
+#endif
+#ifdef O_WRONLY
+    PyModuleConst_LongMacro(O_WRONLY),
+#endif
+#ifdef O_RDWR
+    PyModuleConst_LongMacro(O_RDWR),
+#endif
+#ifdef O_NDELAY
+    PyModuleConst_LongMacro(O_NDELAY),
+#endif
+#ifdef O_NONBLOCK
+    PyModuleConst_LongMacro(O_NONBLOCK),
+#endif
+#ifdef O_APPEND
+    PyModuleConst_LongMacro(O_APPEND),
+#endif
+#ifdef O_DSYNC
+    PyModuleConst_LongMacro(O_DSYNC),
+#endif
+#ifdef O_RSYNC
+    PyModuleConst_LongMacro(O_RSYNC),
+#endif
+#ifdef O_SYNC
+    PyModuleConst_LongMacro(O_SYNC),
+#endif
+#ifdef O_NOCTTY
+    PyModuleConst_LongMacro(O_NOCTTY),
+#endif
+#ifdef O_CREAT
+    PyModuleConst_LongMacro(O_CREAT),
+#endif
+#ifdef O_EXCL
+    PyModuleConst_LongMacro(O_EXCL),
+#endif
+#ifdef O_TRUNC
+    PyModuleConst_LongMacro(O_TRUNC),
+#endif
+#ifdef O_BINARY
+    PyModuleConst_LongMacro(O_BINARY),
+#endif
+#ifdef O_TEXT
+    PyModuleConst_LongMacro(O_TEXT),
+#endif
+#ifdef O_XATTR
+    PyModuleConst_LongMacro(O_XATTR),
+#endif
+#ifdef O_LARGEFILE
+    PyModuleConst_LongMacro(O_LARGEFILE),
+#endif
+    {NULL, 0},
+};
+
+static int
+posixmodule_init_constants(PyObject *module)
+{
+    return PyModule_AddConstants(module, posix_constants);
+}
+
 
 static PyModuleDef_Slot posixmodile_slots[] = {
     {Py_mod_exec, posixmodule_exec},
+    {Py_mod_exec, posixmodule_init_constants},
     {0, NULL}
 };
 

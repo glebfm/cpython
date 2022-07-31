@@ -182,6 +182,62 @@ _add_methods_to_object(PyObject *module, PyObject *name, PyMethodDef *functions)
     return 0;
 }
 
+int
+PyModule_AddConstants(PyObject *module, PyModuleConst_Def *def)
+{
+    PyObject *dict;
+    PyModuleConst_Def *cur_def;
+    PyObject *v;
+    int res;
+
+    dict = PyModule_GetDict(module);
+    if (dict == NULL) {
+        return -1;
+    }
+
+    for (cur_def = def; cur_def && cur_def->name; cur_def++) {
+        switch(cur_def->type) {
+        case _PyModuleConst_none_type:
+            v = Py_NewRef(Py_None);
+            break;
+        case _PyModuleConst_long_type:
+            v = PyLong_FromLong(cur_def->value.m_long);
+            break;
+        case _PyModuleConst_ulong_type:
+            v = PyLong_FromUnsignedLong(cur_def->value.m_ulong);
+            break;
+        case _PyModuleConst_bool_type:
+            v = PyBool_FromLong(cur_def->value.m_long);
+            break;
+        case _PyModuleConst_double_type:
+            v = PyFloat_FromDouble(cur_def->value.m_double);
+            break;
+        case _PyModuleConst_string_type:
+            v =  PyUnicode_FromString(cur_def->value.m_str);
+            break;
+        case _PyModuleConst_call_type:
+            v = cur_def->value.m_call(module);
+            break;
+        default:
+            v = NULL;
+            PyErr_Format(PyExc_SystemError,
+                         "Invalid format for '%s'",
+                          cur_def->name);
+            break;
+        }
+        if (v == NULL) {
+            return -1;
+        }
+        res = PyDict_SetItemString(dict, cur_def->name, v);
+        Py_DECREF(v);
+        if (res < 0) {
+            return -1;
+        }
+    }
+
+    return 0;
+}
+
 PyObject *
 PyModule_Create2(PyModuleDef* module, int module_api_version)
 {
